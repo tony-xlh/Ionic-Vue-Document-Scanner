@@ -31,6 +31,12 @@
     <ion-footer v-if="multipleSelectionMode">
       <ion-toolbar>
         <ion-buttons slot="end">
+          <ion-button @click="selectAll">
+            Select All
+          </ion-button>
+          <ion-button @click="deselectAll">
+            Deselct All
+          </ion-button>
           <ion-button @click="removeSelected">
             Remove Selected
           </ion-button>
@@ -44,6 +50,7 @@
 import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonFabList,IonIcon } from '@ionic/vue';
 import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
 import { defineComponent, ref } from 'vue';
+import Dynamsoft from 'mobile-web-capture';
 import DWT from '../components/DWT.vue'
 import { createOutline,cameraOutline,checkboxOutline,checkbox } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
@@ -107,12 +114,26 @@ export default defineComponent({
       }
     }
 
+    const selectAll = () => {
+      if (DWObject) {
+        DWObject.SelectAllImages();
+      }
+    }
+
+    const deselectAll = () => {
+      if (DWObject) {
+        DWObject.SelectImages([]);
+      }
+    }
+
     return {
       onWebTWAINReady,
       startScan,
       multipleSelectionMode,
       showDocumentEditor,
       removeSelected,
+      selectAll,
+      deselectAll,
       toggleMultipleSelectionMode
     }
   }
