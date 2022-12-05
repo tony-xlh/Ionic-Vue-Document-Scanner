@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Blank</ion-title>
+        <ion-title>Document Scanner</ion-title>
       </ion-toolbar>
     </ion-header>
     
@@ -12,15 +12,23 @@
           <ion-title size="large">Blank</ion-title>
         </ion-toolbar>
       </ion-header>
-      <DWT></DWT>
+      <DWT width="100%" height="100%" @onWebTWAINReady="onWebTWAINReady"></DWT>
+      <ion-fab vertical="bottom" horizontal="start" slot="fixed">
+        <ion-fab-button @click="startScan">
+          <ion-icon name="camera-outline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonFabList,IonIcon } from '@ionic/vue';
+import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
 import { defineComponent } from 'vue';
 import DWT from '../components/DWT.vue'
+import { cameraOutline } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 export default defineComponent({
   name: 'HomePage',
@@ -30,7 +38,32 @@ export default defineComponent({
     IonPage,
     IonTitle,
     IonToolbar,
+    IonFab,
+    IonFabButton,
+    IonFabList,
+    IonIcon,
     DWT
+  },
+  setup() {
+    addIcons({
+      'camera-outline': cameraOutline,
+    });
+
+    let DWObject: WebTwain|null;
+    const onWebTWAINReady = (dwt:WebTwain) {
+      DWObject = dwt;
+    };
+
+    const startScan = () => {
+      if (DWObject) {
+        DWObject.Addon.Camera.scanDocument();
+      }
+    };
+
+    return {
+      onWebTWAINReady,
+      startScan
+    }
   }
 });
 </script>

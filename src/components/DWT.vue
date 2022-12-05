@@ -1,5 +1,5 @@
 <template>
-  <div id="dwtcontrolContainer"></div>
+  <div id="dwtcontrolContainer" ref="container"></div>
 </template>
 
 <script lang="ts">
@@ -8,16 +8,31 @@ import Dynamsoft from 'mobile-web-capture';
 
 export default defineComponent({
   name: 'DWT',
+  props: ['width','height'],
+  emits: ['onWebTWAINReady'],
   components: {
     
   },
-  setup(){
+  setup(props,ctx){
     const containerID = "dwtcontrolContainer";
     const DWObject = ref();
-    const count = ref(0);
+    const container = ref(null);
 
     const OnWebTWAINReady = () => {
       DWObject.value = Dynamsoft.DWT.GetWebTwain(containerID);
+      ctx.emit("onWebTWAINReady",DWObject.value);
+      console.log(container);
+      if (container.value) {
+        let el = container.value as HTMLElement;
+        if (props.height) {
+          DWObject.value.Viewer.height = props.height;
+          el.style.height = props.height;
+        }
+        if (props.width) {
+          DWObject.value.Viewer.width = props.width;
+          el.style.width = props.width;
+        }
+      }
       console.log(DWObject.value);
     }
 
@@ -35,11 +50,11 @@ export default defineComponent({
           Height: '400px'
       }];
       Dynamsoft.DWT.Load();
-    })
+    });
 
     // expose to template and other options API hooks
     return {
-      count
+      container
     }
   }
 });
