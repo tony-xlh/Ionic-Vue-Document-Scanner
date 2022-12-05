@@ -29,6 +29,7 @@ import { defineComponent } from 'vue';
 import DWT from '../components/DWT.vue'
 import { cameraOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+import { ThumbnailViewer } from 'mobile-web-capture/dist/types/WebTwain.Viewer';
 
 export default defineComponent({
   name: 'HomePage',
@@ -50,8 +51,9 @@ export default defineComponent({
     });
 
     let DWObject: WebTwain|null;
-    const onWebTWAINReady = (dwt:WebTwain) {
+    const onWebTWAINReady = (dwt:WebTwain,thumbnail:ThumbnailViewer) => {
       DWObject = dwt;
+      console.log(thumbnail);
     };
 
     const startScan = () => {

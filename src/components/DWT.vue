@@ -13,14 +13,15 @@ export default defineComponent({
   components: {
     
   },
-  setup(props,ctx){
+  setup(props, ctx){
     const containerID = "dwtcontrolContainer";
     const DWObject = ref();
+    const thumbnail = ref();
     const container = ref(null);
 
     const OnWebTWAINReady = () => {
       DWObject.value = Dynamsoft.DWT.GetWebTwain(containerID);
-      ctx.emit("onWebTWAINReady",DWObject.value);
+      
       console.log(container);
       if (container.value) {
         let el = container.value as HTMLElement;
@@ -33,7 +34,30 @@ export default defineComponent({
           el.style.width = props.width;
         }
       }
-      console.log(DWObject.value);
+      let thumbnailViewerSettings = {
+        location: 'left',
+        size: '100%',
+        columns: 2,
+        rows: 3,
+        scrollDirection: 'vertical', // 'horizontal'
+        pageMargin: 10,
+        background: "rgb(255, 255, 255)",
+        border: '',
+        allowKeyboardControl: true,
+        allowPageDragging: true,
+        allowResizing: false,
+        showPageNumber: true,
+        pageBackground: "transparent",
+        pageBorder: "1px solid rgb(238, 238, 238)",
+        hoverBackground: "rgb(239, 246, 253)",
+        hoverPageBorder: "1px solid rgb(238, 238, 238)",
+        placeholderBackground: "rgb(251, 236, 136)",
+        selectedPageBorder: "1px solid rgb(125,162,206)",
+        selectedPageBackground: "rgb(199, 222, 252)"
+      };
+      thumbnail.value = DWObject.value.Viewer.createThumbnailViewer(thumbnailViewerSettings);
+      thumbnail.value.show();
+      ctx.emit("onWebTWAINReady",DWObject.value,thumbnail.value);
     }
 
     onMounted(async () => {
