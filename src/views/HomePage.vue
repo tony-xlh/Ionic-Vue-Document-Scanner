@@ -4,6 +4,9 @@
       <ion-toolbar>
         <ion-title>Document Scanner</ion-title>
         <ion-buttons slot="end">
+          <ion-button @click="save">
+            <ion-icon name="save-outline"></ion-icon>
+          </ion-button>
           <ion-button @click="showDocumentEditor">
             <ion-icon name="create-outline"></ion-icon>
           </ion-button>
@@ -50,9 +53,8 @@
 import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonFabList,IonIcon } from '@ionic/vue';
 import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
 import { defineComponent, ref } from 'vue';
-import Dynamsoft from 'mobile-web-capture';
 import DWT from '../components/DWT.vue'
-import { createOutline,cameraOutline,checkboxOutline,checkbox } from 'ionicons/icons';
+import { createOutline,cameraOutline,saveOutline,checkboxOutline,checkbox } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ThumbnailViewer } from 'mobile-web-capture/dist/types/WebTwain.Viewer';
 
@@ -76,6 +78,7 @@ export default defineComponent({
     addIcons({
       'create-outline': createOutline,
       'camera-outline': cameraOutline,
+      'save-outline': saveOutline,
       'checkbox': checkbox,
       'checkbox-outline': checkboxOutline,
     });
@@ -126,10 +129,23 @@ export default defineComponent({
       }
     }
 
+    const save = () => {
+      if (DWObject) {
+        const OnSuccess = () => {
+          console.log('successful');
+        }
+        const OnFailure = () => {
+          console.log('error');
+        }
+        DWObject.SaveAllAsPDF("Scanned.pdf",OnSuccess,OnFailure);
+      }
+    }
+
     return {
       onWebTWAINReady,
       startScan,
       multipleSelectionMode,
+      save,
       showDocumentEditor,
       removeSelected,
       selectAll,
