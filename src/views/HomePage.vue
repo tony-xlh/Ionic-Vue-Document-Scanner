@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonFabList,IonIcon } from '@ionic/vue';
+import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonIcon } from '@ionic/vue';
 import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
 import { defineComponent, ref } from 'vue';
 import DWT from '../components/DWT.vue'
