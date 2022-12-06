@@ -42,13 +42,19 @@
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonIcon, actionSheetController } from '@ionic/vue';
+import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonIcon, actionSheetController, isPlatform } from '@ionic/vue';
+import Dynamsoft from 'mobile-web-capture';
 import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
-import { defineComponent, ref } from 'vue';
+import { Base64Result } from "mobile-web-capture/dist/types/WebTwain.IO";
+import { defineComponent, onMounted, ref } from 'vue';
 import DWT from '../components/DWT.vue'
 import { createOutline,cameraOutline,saveOutline,checkboxOutline,checkbox,ellipsisHorizontal,ellipsisVertical } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ThumbnailViewer } from 'mobile-web-capture/dist/types/WebTwain.Viewer';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Capacitor } from "@capacitor/core";
+import { Share } from '@capacitor/share';
 
 export default defineComponent({
   name: 'HomePage',
@@ -67,6 +73,21 @@ export default defineComponent({
     DWT
   },
   setup() {
+
+    onMounted(()=>{  
+      if (isPlatform("android")) {
+        checkAndRequestCameraPermission();
+      }
+    });
+
+    const checkAndRequestCameraPermission = async () => {
+      let result = await AndroidPermissions.checkPermission(AndroidPermissions.PERMISSION.CAMERA);
+      if (result.hasPermission == false) {
+        let response = await AndroidPermissions.requestPermission(AndroidPermissions.PERMISSION.CAMERA);
+        console.log(response.hasPermission);
+      }
+    }
+    
     addIcons({
       'ellipsis-horizontal': ellipsisHorizontal,
       'ellipsis-vertical': ellipsisVertical,
@@ -125,14 +146,69 @@ export default defineComponent({
 
     const save = () => {
       if (DWObject) {
-        const OnSuccess = () => {
-          console.log('successful');
+        let filename = getFormattedDate()+".pdf";
+        if (Capacitor.isNativePlatform()) {
+          const OnSuccess = (result:Base64Result, indices:number[], type:number) => {
+            console.log('successful');
+            const share = async () => {
+              let writingResult = await Filesystem.writeFile({
+                path: filename,
+                data: result.getData(0,result.getLength()),
+                directory: Directory.Cache
+              });
+              console.log(writingResult);
+              Share.share({
+                title: filename,
+                text: filename,
+                url: writingResult.uri,
+              });
+            }
+            share();
+          }
+          const OnFailure = () => {
+            console.log('error');
+          }
+          DWObject.ConvertToBase64(getImageIndices(),Dynamsoft.DWT.EnumDWT_ImageType.IT_PDF,OnSuccess,OnFailure);
+        }else{
+          const OnSuccess = () => {
+            console.log('successful');
+          }
+          const OnFailure = () => {
+            console.log('error');
+          }
+          DWObject.SaveAllAsPDF(getFormattedDate()+".pdf",OnSuccess,OnFailure);
         }
-        const OnFailure = () => {
-          console.log('error');
-        }
-        DWObject.SaveAllAsPDF("Scanned.pdf",OnSuccess,OnFailure);
       }
+    }
+
+    const getFormattedDate = () => {
+      let date = new Date();
+
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let hour = date.getHours();
+      let min = date.getMinutes();
+      let sec = date.getSeconds();
+
+      let monthStr = (month < 10 ? "0" : "") + month;
+      let dayStr = (day < 10 ? "0" : "") + day;
+      let hourStr = (hour < 10 ? "0" : "") + hour;
+      let minStr = (min < 10 ? "0" : "") + min;
+      let secStr = (sec < 10 ? "0" : "") + sec;
+
+      let str = date.getFullYear().toString() + monthStr + dayStr + hourStr + minStr + secStr;
+
+      return str;
+    }
+
+    const getImageIndices = () => {
+      let indices = [];
+      if (DWObject) {
+        for (let i=0;i<DWObject.HowManyImagesInBuffer;i++){
+          indices.push(i)
+        }
+      }
+      return indices;
     }
 
     const presentActionSheet = async () => {
