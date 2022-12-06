@@ -11,8 +11,8 @@
     }
   },
   "scripts": {
-    "serve": "ncp node_modules/mobile-web-capture/dist public/dwt-resources && vue-cli-service serve",
-    "build": "ncp node_modules/mobile-web-capture/dist public/dwt-resources && vue-cli-service build",
+    "serve": "ncp node_modules/mobile-web-capture/dist public/assets/dwt-resources && vue-cli-service serve",
+    "build": "ncp node_modules/mobile-web-capture/dist public/assets/dwt-resources && vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"

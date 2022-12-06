@@ -66,7 +66,7 @@ export default defineComponent({
       OnWebTWAINReady();
     });
       Dynamsoft.DWT.UseLocalService = false;
-      Dynamsoft.DWT.ResourcesPath = "dwt-resources";
+      Dynamsoft.DWT.ResourcesPath = "assets/dwt-resources";
       Dynamsoft.DWT.Containers = [{
           WebTwainId: 'dwtObject',
           ContainerId: containerID,

@@ -31,3 +31,4 @@ npm-debug.log*
 /plugins
 /www
 /public/dwt-resources
+/public/assets/dwt-resources
