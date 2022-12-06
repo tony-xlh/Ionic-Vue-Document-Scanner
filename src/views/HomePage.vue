@@ -4,15 +4,12 @@
       <ion-toolbar>
         <ion-title>Document Scanner</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="save">
-            <ion-icon name="save-outline"></ion-icon>
-          </ion-button>
-          <ion-button @click="showDocumentEditor">
-            <ion-icon name="create-outline"></ion-icon>
-          </ion-button>
           <ion-button @click="toggleMultipleSelectionMode">
             <ion-icon v-if="multipleSelectionMode" name="checkbox"></ion-icon>
             <ion-icon v-else name="checkbox-outline"></ion-icon>
+          </ion-button>
+          <ion-button @click="presentActionSheet">
+            <ion-icon ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -45,11 +42,11 @@
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonIcon } from '@ionic/vue';
+import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonIcon, actionSheetController } from '@ionic/vue';
 import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
 import { defineComponent, ref } from 'vue';
 import DWT from '../components/DWT.vue'
-import { createOutline,cameraOutline,saveOutline,checkboxOutline,checkbox } from 'ionicons/icons';
+import { createOutline,cameraOutline,saveOutline,checkboxOutline,checkbox,ellipsisHorizontal,ellipsisVertical } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ThumbnailViewer } from 'mobile-web-capture/dist/types/WebTwain.Viewer';
 
@@ -71,6 +68,8 @@ export default defineComponent({
   },
   setup() {
     addIcons({
+      'ellipsis-horizontal': ellipsisHorizontal,
+      'ellipsis-vertical': ellipsisVertical,
       'create-outline': createOutline,
       'camera-outline': cameraOutline,
       'save-outline': saveOutline,
@@ -136,6 +135,26 @@ export default defineComponent({
       }
     }
 
+    const presentActionSheet = async () => {
+        const actionSheet = await actionSheetController.create({
+          header: 'Action',
+          buttons: [
+            {
+              text: 'Save',
+              handler: save
+            },
+            {
+              text: 'Edit',
+              handler: showDocumentEditor
+            },
+            {
+              text: 'Cancel',
+            },
+          ],
+        });
+        await actionSheet.present();
+      };
+
     return {
       onWebTWAINReady,
       startScan,
@@ -145,6 +164,7 @@ export default defineComponent({
       removeSelected,
       selectAll,
       deselectAll,
+      presentActionSheet,
       toggleMultipleSelectionMode
     }
   }
