@@ -3,11 +3,13 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>Document Scanner</ion-title>
-        <ion-buttons slot="end">
+        <ion-buttons slot="secondary">
           <ion-button @click="toggleMultipleSelectionMode">
             <ion-icon v-if="multipleSelectionMode" name="checkbox"></ion-icon>
             <ion-icon v-else name="checkbox-outline"></ion-icon>
           </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="primary">
           <ion-button @click="presentActionSheet">
             <ion-icon ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
           </ion-button>

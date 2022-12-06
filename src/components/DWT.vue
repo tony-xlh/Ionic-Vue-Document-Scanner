@@ -21,8 +21,6 @@ export default defineComponent({
 
     const OnWebTWAINReady = () => {
       DWObject.value = Dynamsoft.DWT.GetWebTwain(containerID);
-      
-      console.log(container);
       if (container.value) {
         let el = container.value as HTMLElement;
         if (props.height) {
