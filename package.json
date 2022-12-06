@@ -3,6 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "description": "An Ionic project",
+  "vue":{
+    "pwa":{
+      "workboxOptions":{
+        "maximumFileSizeToCacheInBytes": 1073741824
+      }
+    }
+  },
   "scripts": {
     "serve": "ncp node_modules/mobile-web-capture/dist public/dwt-resources && vue-cli-service serve",
     "build": "ncp node_modules/mobile-web-capture/dist public/dwt-resources && vue-cli-service build",
