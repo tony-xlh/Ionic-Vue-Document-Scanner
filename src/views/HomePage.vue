@@ -77,7 +77,7 @@ export default defineComponent({
   setup() {
 
     onMounted(()=>{  
-      if (isPlatform("android")) {
+      if (Capacitor.getPlatform()==="android") {
         checkAndRequestCameraPermission();
       }
     });
