@@ -28,19 +28,17 @@
     </ion-content>
     <ion-footer v-if="multipleSelectionMode">
       <ion-toolbar>
-        <div style="width:100%;height:100%;overflow:auto;">
-          <ion-buttons>
-            <ion-button @click="selectAll">
-              Select All
-            </ion-button>
-            <ion-button @click="deselectAll">
-              Deselct All
-            </ion-button>
-            <ion-button @click="removeSelected">
-              Remove Selected
-            </ion-button>
-          </ion-buttons>
-        </div>
+        <ion-buttons>
+          <ion-button @click="selectAll">
+            Select All
+          </ion-button>
+          <ion-button @click="deselectAll">
+            Deselct All
+          </ion-button>
+          <ion-button @click="removeSelected">
+            Remove Selected
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-footer>
   </ion-page>
@@ -154,4 +152,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
+ion-buttons {
+  overflow:auto;
+}
 </style>
