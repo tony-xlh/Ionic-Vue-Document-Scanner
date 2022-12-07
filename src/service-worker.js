@@ -5,7 +5,14 @@ import { StaleWhileRevalidate } from "workbox-strategies";
 
 clientsClaim();
 self.skipWaiting();
-precacheAndRoute(self.__WB_MANIFEST);
+
+registerRoute(
+  ({ url }) =>
+    url.href.indexOf("dwt-resources") != -1,
+  new StaleWhileRevalidate({
+    cacheName: "dwt-resources",
+  })
+);
 
 registerRoute(
   ({ request }) =>
@@ -14,3 +21,7 @@ registerRoute(
     cacheName: "static-resources",
   })
 );
+
+
+precacheAndRoute(self.__WB_MANIFEST);
+
