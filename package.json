@@ -5,7 +5,9 @@
   "description": "An Ionic project",
   "vue": {
     "pwa": {
+      "workboxPluginMode": "InjectManifest",
       "workboxOptions": {
+        "swSrc": "./src/service-worker.js",
         "maximumFileSizeToCacheInBytes": 1073741824
       }
     }
