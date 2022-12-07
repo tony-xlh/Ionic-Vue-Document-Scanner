@@ -22,6 +22,9 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+
+import './main.css';
+
 import './registerServiceWorker';
 
 const app = createApp(App)

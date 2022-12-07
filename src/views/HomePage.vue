@@ -47,6 +47,7 @@
 import { IonContent, IonHeader, IonFooter, IonButtons, IonButton, IonPage, IonTitle, IonToolbar, IonFab,IonFabButton,IonIcon, actionSheetController, isPlatform } from '@ionic/vue';
 import Dynamsoft from 'mobile-web-capture';
 import { WebTwain } from 'mobile-web-capture/dist/types/WebTwain';
+import { DocumentConfiguration } from "mobile-web-capture/dist/types/Addon.Camera";
 import { Base64Result } from "mobile-web-capture/dist/types/WebTwain.IO";
 import { defineComponent, onMounted, ref } from 'vue';
 import DWT from '../components/DWT.vue'
@@ -57,6 +58,7 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Capacitor } from "@capacitor/core";
 import { Share } from '@capacitor/share';
+import { DynamsoftEnumsDWT } from 'mobile-web-capture/dist/types/Dynamsoft.Enum';
 
 export default defineComponent({
   name: 'HomePage',
@@ -110,7 +112,30 @@ export default defineComponent({
 
     const startScan = () => {
       if (DWObject) {
-        DWObject.Addon.Camera.scanDocument();
+        let container = document.createElement("div");
+        container.className = "fullscreen";
+        document.body.appendChild(container);
+
+        const funcConfirmExit = (bExistImage:boolean):Promise<boolean> => {
+          container.remove();
+          return Promise.resolve(true);
+        }
+
+        const funcConfirmExitAfterSave = () => {
+          container.remove();
+        };
+
+        let showVideoConfigs:DocumentConfiguration = {
+          scannerViewer:{
+            element: container,
+            continuousScan: false,
+            funcConfirmExit: funcConfirmExit,
+          },
+          documentEditorSettings:{
+            funcConfirmExitAfterSave:funcConfirmExitAfterSave
+          }
+        };
+        DWObject.Addon.Camera.scanDocument(showVideoConfigs);
       }
     };
 
@@ -123,7 +148,23 @@ export default defineComponent({
 
     const showDocumentEditor = () => {
       if (DWObject) {
-        let documentEditor = DWObject.Viewer.createDocumentEditor();
+        let container = document.createElement("div");
+        container.className = "fullscreen";
+        document.body.appendChild(container);
+        const funcConfirmExitAfterSave = () => {
+          container.remove();
+        };
+        const funcConfirmExit = (bChanged: boolean, previousViewerName: string):Promise<number | DynamsoftEnumsDWT.EnumDWT_ConfirmExitType> =>  {
+          container.remove();
+          return Promise.resolve(Dynamsoft.DWT.EnumDWT_ConfirmExitType.Exit);
+        };
+        let config:DocumentConfiguration = {
+          documentEditorSettings:{
+            funcConfirmExit:funcConfirmExit,
+            funcConfirmExitAfterSave:funcConfirmExitAfterSave
+          }
+        };
+        let documentEditor = DWObject.Viewer.createDocumentEditor(config);
         documentEditor.show();
       }
     }
