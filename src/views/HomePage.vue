@@ -132,6 +132,7 @@ export default defineComponent({
             funcConfirmExit: funcConfirmExit,
           },
           documentEditorSettings:{
+            element:container,
             funcConfirmExitAfterSave:funcConfirmExitAfterSave
           }
         };
@@ -160,6 +161,7 @@ export default defineComponent({
         };
         let config:DocumentConfiguration = {
           documentEditorSettings:{
+            element:container,
             funcConfirmExit:funcConfirmExit,
             funcConfirmExitAfterSave:funcConfirmExitAfterSave
           }
