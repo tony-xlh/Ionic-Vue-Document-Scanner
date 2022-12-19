@@ -257,24 +257,24 @@ export default defineComponent({
     }
 
     const presentActionSheet = async () => {
-        const actionSheet = await actionSheetController.create({
-          header: 'Action',
-          buttons: [
-            {
-              text: 'Save',
-              handler: save
-            },
-            {
-              text: 'Edit',
-              handler: showDocumentEditor
-            },
-            {
-              text: 'Cancel',
-            },
-          ],
-        });
-        await actionSheet.present();
-      };
+      const actionSheet = await actionSheetController.create({
+        header: 'Action',
+        buttons: [
+          {
+            text: 'Save',
+            handler: save
+          },
+          {
+            text: 'Edit',
+            handler: showDocumentEditor
+          },
+          {
+            text: 'Cancel',
+          },
+        ],
+      });
+      await actionSheet.present();
+    };
 
     return {
       onWebTWAINReady,
