@@ -71,6 +71,7 @@ export default defineComponent({
           Width: '300px',
           Height: '400px'
       }];
+      Dynamsoft.DWT.ProductKey = "t01509gIAAAoQpK3c9EfPo8P0y+sn6/TItS2tSqWwY+5SXE7QH0BS2rEoKTmAKmOgUWoSVAgPDhxWHwOjp2VplYRj6NuG076k5YYIDGYTbavUp+IMV/AwoAPAF9kDe+UHPPVzG1VwgBnQBFg3/oDjkN9eMQjpATOgCTgO6UDQyda/qbwUsoyQEgJmQBMwQjpQud7d5zd/ZZW+";
       Dynamsoft.DWT.Load();
     });
 
