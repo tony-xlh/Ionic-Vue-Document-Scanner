@@ -6,10 +6,13 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
+      <div class="document-scanner">
+        <img v-for="(dataURL,index) in scannedImages" :key="index" :src="dataURL" alt="scanned">
+      </div>
       <div :class="'footer'+(mode!='normal'?' hidden':'')">
         <button class="shutter-button round" @click="startScanning">Scan</button>
       </div>
-      <div class="cropper fullscreen" v-if="mode==='cropping'">
+      <div :class="'cropper fullscreen'+(mode!='cropping'?' hidden':'')" >
         <image-cropper :img="img"></image-cropper>
       </div>
       <div class="scanner fullscreen" v-if="mode==='scanning'">
@@ -22,14 +25,52 @@
 <script setup lang="ts">
 import DocumentScanner from '@/components/DocumentScanner.vue';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
-import { DetectedQuadResultItem } from 'image-cropper-component';
-import { ref } from 'vue';
+import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
+import { DetectedQuadResultItem, Quad } from 'image-cropper-component';
+import { onMounted, ref } from 'vue';
 
+const scannedImages = ref<string[]>([]);
 const img = ref<undefined|HTMLImageElement>();
 const mode = ref<"scanning"|"cropping"|"normal">("normal");
 
 const startScanning = () => {
   mode.value = "scanning";
+}
+
+onMounted(() => {
+  const cropper = document.querySelector("image-cropper");
+  if (cropper) {
+    cropper.addEventListener("canceled",function(){
+      mode.value = "normal";
+    });
+    cropper.addEventListener("confirmed",function(){
+      mode.value = "normal";
+      loadCroppedImage();
+    });
+  }
+});
+
+const loadCroppedImage = async () => {
+  const cropper = document.querySelector("image-cropper");
+  if (cropper) {
+    const quad = await cropper.getQuad();
+    const quadItem:any = quad;
+    quadItem.area = 0;
+    const response = await DocumentNormalizer.normalize({source:cropper.img,quad:quadItem,template:"NormalizeDocument_Color",includeBase64:true});
+    let base64 = response.result.base64;
+    if (base64) {
+      if (!base64.startsWith("data")) {
+        base64 = "data:image/jpeg;base64," + base64;
+      }
+      const newList:string[] = [];
+      for (let index = 0; index < scannedImages.value.length; index++) {
+        const element = scannedImages.value[index];
+        newList.push(element);
+      }
+      newList.push(base64);
+      scannedImages.value = newList;
+    }
+  }
 }
 
 const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
@@ -38,7 +79,12 @@ const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
   image.src = url;
   image.onload = function(){
     img.value = image;
-    console.log(image);
+    if (results.length>0) {
+      const item = results[0];
+      const quadItem:Quad = {points:item.location.points};
+      document.querySelector("image-cropper")!.quad = quadItem;
+      console.log(quadItem);
+    }
   }
   console.log(results);
   mode.value = "cropping";
