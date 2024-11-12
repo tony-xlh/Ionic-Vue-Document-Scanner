@@ -1,6 +1,7 @@
 <template>
   <div ref="container" class="container">
     <div class="dce-video-container"></div>
+    <SVGOverlay :viewBox="viewBox" :quad="quadResultItem"></SVGOverlay>
   </div>
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button>
@@ -28,6 +29,7 @@ import { CameraPreview } from 'capacitor-plugin-camera';
 import { DocumentNormalizer, intersectionOverUnion } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer'
 import { Capacitor, PluginListenerHandle } from "@capacitor/core";
+import SVGOverlay from '@/components/SVGOverlay.vue';
 import {
   chevronUpCircle,
   flashlight,
@@ -36,6 +38,7 @@ import {
 } from 'ionicons/icons';
 const previousResults:DetectedQuadResultItem[] = [];
 const quadResultItem = ref<undefined|DetectedQuadResultItem>()
+const viewBox = ref("0 0 1280 720");
 
 const emit = defineEmits<{
   (e: 'onStopped'): void
@@ -61,6 +64,7 @@ onMounted(async () => {
   }
   
   onPlayedListener = await CameraPreview.addListener("onPlayed", () => {
+    updateViewBox();
     startScanning();
   });
 
@@ -122,6 +126,25 @@ const captureAndDetect = async () => {
     console.log(error);
   }
   detecting = false;
+}
+
+const updateViewBox = async () => {
+  const res = (await CameraPreview.getResolution()).resolution;
+  const width = parseInt(res.split("x")[0]);
+  const height = parseInt(res.split("x")[1]);
+  const orientation = (await CameraPreview.getOrientation()).orientation;
+  let box:string;
+  if (orientation === "PORTRAIT") {
+    if (!Capacitor.isNativePlatform()) {
+      box = "0 0 "+width+" "+height;
+    }else{
+      box = "0 0 "+height+" "+width;
+    }
+  }else{
+    box = "0 0 "+width+" "+height;
+  }
+  console.log(box);
+  viewBox.value = box;
 }
 
 const checkIfSteady = (results:DetectedQuadResultItem[]) => {
