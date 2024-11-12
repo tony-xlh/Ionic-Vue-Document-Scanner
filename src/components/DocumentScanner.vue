@@ -53,22 +53,26 @@ let interval:any;
 let detecting = false;
 
 onMounted(async () => {
-  if (container.value && Capacitor.isNativePlatform() === false) {
-    await CameraPreview.setElement(container.value);
-  }
-  await CameraPreview.initialize();
-  await CameraPreview.requestCameraPermission();
-  await DocumentNormalizer.initialize();
-  if (onPlayedListener) {
-    onPlayedListener.remove();
-  }
-  
-  onPlayedListener = await CameraPreview.addListener("onPlayed", () => {
-    updateViewBox();
-    startScanning();
-  });
+  try {
+    if (container.value && Capacitor.isNativePlatform() === false) {
+      await CameraPreview.setElement(container.value);
+    }
+    await CameraPreview.initialize();
+    await CameraPreview.requestCameraPermission();
+    await DocumentNormalizer.initialize();
+    if (onPlayedListener) {
+      onPlayedListener.remove();
+    }
+    
+    onPlayedListener = await CameraPreview.addListener("onPlayed", () => {
+      updateViewBox();
+      startScanning();
+    });
 
-  await CameraPreview.startCamera();
+    await CameraPreview.startCamera();
+  } catch (error) {
+    alert(error);
+  }
   initialized.value = true;
 });
 
