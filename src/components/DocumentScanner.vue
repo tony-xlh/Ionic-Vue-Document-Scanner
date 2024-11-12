@@ -2,26 +2,49 @@
   <div ref="container" class="container">
     <div class="dce-video-container"></div>
   </div>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button>
+      <ion-icon :icon="chevronUpCircle"></ion-icon>
+    </ion-fab-button>
+    <ion-fabList side="top">
+      <ion-fab-button @click="stopCamera">
+        <ion-icon :icon="stop"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button @click="switchCamera">
+        <ion-icon :icon="cameraReverse"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button @click="toggleTorch">
+        <ion-icon :icon="flashlight"></ion-icon>
+      </ion-fab-button>
+    </ion-fabList>
+  </ion-fab>
   <ion-loading :is-open="!initialized" message="Loading..." />
 </template>
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { IonLoading } from '@ionic/vue';
+import { IonFab, IonFabButton, IonIcon, IonFabList, IonLoading } from '@ionic/vue';
 import { CameraPreview } from 'capacitor-plugin-camera';
 import { DocumentNormalizer, intersectionOverUnion } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer'
 import { Capacitor, PluginListenerHandle } from "@capacitor/core";
+import {
+  chevronUpCircle,
+  flashlight,
+  stop,
+  cameraReverse,
+} from 'ionicons/icons';
 const previousResults:DetectedQuadResultItem[] = [];
 const quadResultItem = ref<undefined|DetectedQuadResultItem>()
 
 const emit = defineEmits<{
-  (e: 'onBack'): void
+  (e: 'onStopped'): void
   (e: 'onScanned',blob:Blob,detectionResults:DetectedQuadResultItem[]): void
 }>();
 
 const container = ref<HTMLDivElement|undefined>();
 const initialized = ref(false);
+let torchOn = false;
 let onPlayedListener:PluginListenerHandle|undefined;
 let interval:any;
 let detecting = false;
@@ -60,6 +83,15 @@ const startScanning = () => {
 
 const stopScanning = () => {
   clearInterval(interval);
+}
+
+const stopCamera = async () => {
+  if (onPlayedListener) {
+    onPlayedListener.remove();
+  }
+  stopScanning();
+  await CameraPreview.stopCamera();
+  emit("onStopped");
 }
 
 const captureAndDetect = async () => {
@@ -170,6 +202,26 @@ const loadBlobAsImage = (blob:Blob):Promise<HTMLImageElement> => {
     img.src = URL.createObjectURL(blob);
   });
 }
+
+const switchCamera = async () => {
+  const currentCamera = (await CameraPreview.getSelectedCamera()).selectedCamera;
+  const result = await CameraPreview.getAllCameras();
+  const cameras = result.cameras;
+  const currentCameraIndex = cameras.indexOf(currentCamera);
+  let desiredIndex = 0
+  if (currentCameraIndex < cameras.length - 1) {
+    desiredIndex = currentCameraIndex + 1;
+  }
+  await CameraPreview.selectCamera({cameraID:cameras[desiredIndex]});
+}
+
+const toggleTorch = () => {
+  if (initialized.value) {
+    torchOn = !torchOn;
+    CameraPreview.toggleTorch({on:torchOn});
+  }
+}
+
 </script>
 
 <style scoped>
