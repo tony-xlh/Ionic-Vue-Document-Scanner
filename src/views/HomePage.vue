@@ -54,6 +54,7 @@ const img = ref<undefined|HTMLImageElement>();
 const viewer = ref<undefined|HTMLDivElement>();
 const mode = ref<"scanning"|"cropping"|"normal">("normal");
 let ionBackground = "";
+let photoPath:string|undefined;
 
 onMounted(async () => {
   try {
@@ -136,19 +137,28 @@ const loadCroppedImage = async () => {
     const quad = await cropper.getQuad();
     const quadItem:any = quad;
     quadItem.area = 0;
-    const response = await DocumentNormalizer.normalize({source:cropper.img,quad:quadItem,template:"NormalizeDocument_Color",includeBase64:true});
-    let base64 = response.result.base64;
-    if (base64) {
-      if (!base64.startsWith("data")) {
-        base64 = "data:image/jpeg;base64," + base64;
+    let response;
+    if (Capacitor.isNativePlatform()) {
+      if (photoPath) {
+        response = await DocumentNormalizer.normalize({path:photoPath,quad:quadItem,template:"NormalizeDocument_Color",includeBase64:true});
       }
-      const newList:string[] = [];
-      for (let index = 0; index < scannedImages.value.length; index++) {
-        const element = scannedImages.value[index];
-        newList.push(element);
+    }else{
+      response = await DocumentNormalizer.normalize({source:cropper.img,quad:quadItem,template:"NormalizeDocument_Color",includeBase64:true});
+    }
+    if (response) {
+      let base64 = response.result.base64;
+      if (base64) {
+        if (!base64.startsWith("data")) {
+          base64 = "data:image/jpeg;base64," + base64;
+        }
+        const newList:string[] = [];
+        for (let index = 0; index < scannedImages.value.length; index++) {
+          const element = scannedImages.value[index];
+          newList.push(element);
+        }
+        newList.push(base64);
+        scannedImages.value = newList;
       }
-      newList.push(base64);
-      scannedImages.value = newList;
     }
   }
 }
@@ -158,7 +168,8 @@ const onStopped = () => {
   document.documentElement.style.setProperty('--ion-background-color', ionBackground);
 }
 
-const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
+const onScanned = (blob:Blob,path:string|undefined,results:DetectedQuadResultItem[]) => {
+  photoPath = path;
   document.documentElement.style.setProperty('--ion-background-color', ionBackground);
   const url = URL.createObjectURL(blob);
   const image = document.createElement("img");

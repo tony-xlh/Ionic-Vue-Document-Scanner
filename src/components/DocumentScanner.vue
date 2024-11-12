@@ -42,7 +42,7 @@ const viewBox = ref("0 0 1280 720");
 
 const emit = defineEmits<{
   (e: 'onStopped'): void
-  (e: 'onScanned',blob:Blob,detectionResults:DetectedQuadResultItem[]): void
+  (e: 'onScanned',blob:Blob,path:string|undefined,detectionResults:DetectedQuadResultItem[]): void
 }>();
 
 const container = ref<HTMLDivElement|undefined>();
@@ -189,10 +189,12 @@ const takePhotoAndStop = async () => {
   stopScanning();
   let blob:Blob|undefined;
   let detectionResults:DetectedQuadResultItem[] = [];
+  let path;
   if (Capacitor.isNativePlatform()) {
     const photo = await CameraPreview.takePhoto({includeBase64:true});
     blob = await getBlobFromBase64(photo.base64!);
     detectionResults = (await DocumentNormalizer.detect({path:photo.path})).results;
+    path = photo.path;
     console.log(detectionResults);
   }else{
     const photo = await CameraPreview.takePhoto({});
@@ -207,7 +209,7 @@ const takePhotoAndStop = async () => {
     detectionResults = (await DocumentNormalizer.detect({source:img})).results;
   }
   if (blob && detectionResults) {
-    emit("onScanned", blob, detectionResults);
+    emit("onScanned", blob, path, detectionResults);
   }
 }
 
