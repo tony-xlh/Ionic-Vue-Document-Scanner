@@ -26,7 +26,7 @@
         <image-cropper :img="img" v-on:canceled="onCanceled" v-on:confirmed="onConfirmed"></image-cropper>
       </div>
       <div class="scanner fullscreen" v-if="mode==='scanning'">
-        <DocumentScanner @on-scanned="onScanned"></DocumentScanner>
+        <DocumentScanner @on-scanned="onScanned" @on-stopped="onStopped"></DocumentScanner>
       </div>
     </ion-content>
   </ion-page>
@@ -135,6 +135,10 @@ const loadCroppedImage = async () => {
       scannedImages.value = newList;
     }
   }
+}
+
+const onStopped = () => {
+  mode.value = "normal";
 }
 
 const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
