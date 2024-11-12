@@ -6,8 +6,10 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <div class="document-scanner">
-        <img v-for="(dataURL,index) in scannedImages" :key="index" :src="dataURL" alt="scanned">
+      <div class="documentViewer">
+        <div class="image" v-for="(dataURL,index) in scannedImages" :key="index" >
+          <img :src="dataURL" alt="scanned" />
+        </div>
       </div>
       <div :class="'footer'+(mode!='normal'?' hidden':'')">
         <button class="shutter-button round" @click="startScanning">Scan</button>
@@ -139,5 +141,30 @@ const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
 
 .hidden {
   visibility: hidden;
+}
+
+.documentViewer {
+  width: 100%;
+  height: calc(100% - 50px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 48%);
+  grid-row-gap: 10px;
+  grid-column-gap: 4%;
+  overflow: auto;
+}
+
+.image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  height: 200px;
+  border: 1px solid gray;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 </style>
