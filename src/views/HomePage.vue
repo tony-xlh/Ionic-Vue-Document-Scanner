@@ -10,7 +10,7 @@
         <button class="shutter-button round" @click="startScanning">Scan</button>
       </div>
       <div class="cropper fullscreen" v-if="mode==='cropping'">
-        <image-cropper @img="img"></image-cropper>
+        <image-cropper :img="img"></image-cropper>
       </div>
       <div class="scanner fullscreen" v-if="mode==='scanning'">
         <DocumentScanner @on-scanned="onScanned"></DocumentScanner>
@@ -36,7 +36,10 @@ const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
   const url = URL.createObjectURL(blob);
   const image = document.createElement("img");
   image.src = url;
-  img.value = image;
+  image.onload = function(){
+    img.value = image;
+    console.log(image);
+  }
   console.log(results);
   mode.value = "cropping";
 }
