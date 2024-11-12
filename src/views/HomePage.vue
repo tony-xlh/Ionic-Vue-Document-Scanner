@@ -28,13 +28,14 @@
       <div class="scanner fullscreen" v-if="mode==='scanning'">
         <DocumentScanner @on-scanned="onScanned" @on-stopped="onStopped"></DocumentScanner>
       </div>
+      <ion-loading :is-open="!initialized" message="Loading..." />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import DocumentScanner from '@/components/DocumentScanner.vue';
-import { IonButtons, IonButton, IonIcon, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonButtons, IonButton, IonIcon, IonLoading, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem, Quad } from 'image-cropper-component';
 import { onMounted, ref } from 'vue';
@@ -46,6 +47,8 @@ import { Capacitor } from '@capacitor/core';
 import jsPDF, { jsPDFOptions } from 'jspdf';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+
+const initialized = ref<boolean>(false);
 const scannedImages = ref<string[]>([]);
 const img = ref<undefined|HTMLImageElement>();
 const viewer = ref<undefined|HTMLDivElement>();
@@ -53,6 +56,12 @@ const mode = ref<"scanning"|"cropping"|"normal">("normal");
 let ionBackground = "";
 
 onMounted(async () => {
+  try {
+    await DocumentNormalizer.initLicense({license:"DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="});  
+  }catch(error) {
+    alert(error);
+  }
+  initialized.value = true;
   ionBackground = document.documentElement.style.getPropertyValue('--ion-background-color');
 });
 
