@@ -34,6 +34,10 @@ import '@ionic/vue/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
+//@ts-expect-error: no types
+import { defineCustomElements } from 'image-cropper-component/dist/esm/loader.js';
+defineCustomElements();
+
 const app = createApp(App)
   .use(IonicVue)
   .use(router);

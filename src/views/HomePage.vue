@@ -1,16 +1,19 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true" :class="scanning?'hidden':''">
+    <ion-header :translucent="true" :class="mode!='normal'?'hidden':''">
       <ion-toolbar>
         <ion-title>Docs Scan</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <div :class="'footer'+(scanning?' hidden':'')">
+      <div :class="'footer'+(mode!='normal'?' hidden':'')">
         <button class="shutter-button round" @click="startScanning">Scan</button>
       </div>
-      <div class="scanner fullscreen" v-if="scanning">
-        <DocumentScanner></DocumentScanner>
+      <div class="cropper fullscreen" v-if="mode==='cropping'">
+        <image-cropper @img="img"></image-cropper>
+      </div>
+      <div class="scanner fullscreen" v-if="mode==='scanning'">
+        <DocumentScanner @on-scanned="onScanned"></DocumentScanner>
       </div>
     </ion-content>
   </ion-page>
@@ -19,12 +22,23 @@
 <script setup lang="ts">
 import DocumentScanner from '@/components/DocumentScanner.vue';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { DetectedQuadResultItem } from 'image-cropper-component';
 import { ref } from 'vue';
 
-const scanning = ref(false);
+const img = ref<undefined|HTMLImageElement>();
+const mode = ref<"scanning"|"cropping"|"normal">("normal");
 
 const startScanning = () => {
-  scanning.value = true;
+  mode.value = "scanning";
+}
+
+const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
+  const url = URL.createObjectURL(blob);
+  const image = document.createElement("img");
+  image.src = url;
+  img.value = image;
+  console.log(results);
+  mode.value = "cropping";
 }
 </script>
 
