@@ -3,10 +3,18 @@
     <ion-header :translucent="true" :class="mode!='normal'?'hidden':''">
       <ion-toolbar>
         <ion-title>Docs Scan</ion-title>
+        <ion-buttons slot="primary">
+          <ion-button @click="clearImages">
+            <ion-icon :icon="trash"></ion-icon>
+          </ion-button>
+          <ion-button @click="saveImages">
+            <ion-icon :icon="save"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <div class="documentViewer">
+      <div class="documentViewer" ref="viewer">
         <div class="image" v-for="(dataURL,index) in scannedImages" :key="index" >
           <img :src="dataURL" alt="scanned" />
         </div>
@@ -26,19 +34,76 @@
 
 <script setup lang="ts">
 import DocumentScanner from '@/components/DocumentScanner.vue';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonButtons, IonButton, IonIcon, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem, Quad } from 'image-cropper-component';
 import { ref } from 'vue';
-
+import {
+  trash,
+  save
+} from 'ionicons/icons';
+import { Capacitor } from '@capacitor/core';
+import jsPDF, { jsPDFOptions } from 'jspdf';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 const scannedImages = ref<string[]>([]);
 const img = ref<undefined|HTMLImageElement>();
+const viewer = ref<undefined|HTMLDivElement>();
 const mode = ref<"scanning"|"cropping"|"normal">("normal");
+
+const clearImages = () => {
+  scannedImages.value = [];
+}
+
+const saveImages = async () => {
+  if (!viewer.value) {
+    return;
+  }
+  const images = viewer.value.getElementsByTagName("img");
+  if (images.length === 0) {
+    alert("No images");
+    return;
+  }
+  let orientation:"p" | "portrait" | "l" | "landscape" | undefined = "p";
+  if (images[0].naturalWidth>images[0].naturalHeight) {
+    orientation = "l";
+  }
+  const options:jsPDFOptions  = {orientation:orientation,unit: "px", format: [images[0].naturalWidth, images[0].naturalHeight]};
+  const doc = new jsPDF(options);
+
+  for (let index = 0; index < images.length; index++) {
+    const image = images[index];
+    if (index > 0) {
+      if (image.naturalWidth>image.naturalHeight) {
+        orientation = "l";
+      }else{
+        orientation = "p";
+      }
+      doc.addPage([image.naturalWidth,image.naturalHeight],orientation);
+    }
+    doc.addImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+  }
+  if (Capacitor.isNativePlatform()) {
+    const data = doc.output("datauristring");    
+    const fileName = "scanned.pdf";
+    const writingResult = await Filesystem.writeFile({
+      path: fileName,
+      data: data,
+      directory: Directory.Cache
+    });
+    Share.share({
+      title: fileName,
+      text: fileName,
+      url: writingResult.uri,
+    });
+  }else{
+    doc.save("scanned.pdf");
+  }
+}
 
 const startScanning = () => {
   mode.value = "scanning";
 }
-
 
 const onCanceled = () => {
   mode.value = "normal";

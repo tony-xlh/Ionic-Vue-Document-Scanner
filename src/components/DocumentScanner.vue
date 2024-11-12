@@ -6,7 +6,7 @@
     <ion-fab-button>
       <ion-icon :icon="chevronUpCircle"></ion-icon>
     </ion-fab-button>
-    <ion-fabList side="top">
+    <ion-fab-list side="top">
       <ion-fab-button @click="stopCamera">
         <ion-icon :icon="stop"></ion-icon>
       </ion-fab-button>
@@ -16,7 +16,7 @@
       <ion-fab-button @click="toggleTorch">
         <ion-icon :icon="flashlight"></ion-icon>
       </ion-fab-button>
-    </ion-fabList>
+    </ion-fab-list>
   </ion-fab>
   <ion-loading :is-open="!initialized" message="Loading..." />
 </template>
