@@ -15,7 +15,7 @@
         <button class="shutter-button round" @click="startScanning">Scan</button>
       </div>
       <div :class="'cropper fullscreen'+(mode!='cropping'?' hidden':'')" >
-        <image-cropper :img="img"></image-cropper>
+        <image-cropper :img="img" v-on:canceled="onCanceled" v-on:confirmed="onConfirmed"></image-cropper>
       </div>
       <div class="scanner fullscreen" v-if="mode==='scanning'">
         <DocumentScanner @on-scanned="onScanned"></DocumentScanner>
@@ -29,7 +29,7 @@ import DocumentScanner from '@/components/DocumentScanner.vue';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem, Quad } from 'image-cropper-component';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 
 const scannedImages = ref<string[]>([]);
 const img = ref<undefined|HTMLImageElement>();
@@ -39,18 +39,15 @@ const startScanning = () => {
   mode.value = "scanning";
 }
 
-onMounted(() => {
-  const cropper = document.querySelector("image-cropper");
-  if (cropper) {
-    cropper.addEventListener("canceled",function(){
-      mode.value = "normal";
-    });
-    cropper.addEventListener("confirmed",function(){
-      mode.value = "normal";
-      loadCroppedImage();
-    });
-  }
-});
+
+const onCanceled = () => {
+  mode.value = "normal";
+}
+
+const onConfirmed = () => {
+  mode.value = "normal";
+  loadCroppedImage();
+}
 
 const loadCroppedImage = async () => {
   const cropper = document.querySelector("image-cropper");
