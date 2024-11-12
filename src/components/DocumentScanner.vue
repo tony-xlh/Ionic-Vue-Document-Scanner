@@ -2,10 +2,12 @@
   <div ref="container" class="container">
     <div class="dce-video-container"></div>
   </div>
+  <ion-loading :is-open="!initialized" message="Loading..." />
 </template>
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { IonLoading } from '@ionic/vue';
 import { CameraPreview } from 'capacitor-plugin-camera';
 import { DocumentNormalizer, intersectionOverUnion } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer'
