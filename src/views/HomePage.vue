@@ -37,7 +37,7 @@ import DocumentScanner from '@/components/DocumentScanner.vue';
 import { IonButtons, IonButton, IonIcon, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem, Quad } from 'image-cropper-component';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import {
   trash,
   save
@@ -50,6 +50,12 @@ const scannedImages = ref<string[]>([]);
 const img = ref<undefined|HTMLImageElement>();
 const viewer = ref<undefined|HTMLDivElement>();
 const mode = ref<"scanning"|"cropping"|"normal">("normal");
+let ionBackground = "";
+
+onMounted(async () => {
+  ionBackground = document.documentElement.style.getPropertyValue('--ion-background-color');
+});
+
 
 const clearImages = () => {
   scannedImages.value = [];
@@ -102,6 +108,7 @@ const saveImages = async () => {
 }
 
 const startScanning = () => {
+  document.documentElement.style.setProperty('--ion-background-color', 'transparent');
   mode.value = "scanning";
 }
 
@@ -139,9 +146,11 @@ const loadCroppedImage = async () => {
 
 const onStopped = () => {
   mode.value = "normal";
+  document.documentElement.style.setProperty('--ion-background-color', ionBackground);
 }
 
 const onScanned = (blob:Blob,results:DetectedQuadResultItem[]) => {
+  document.documentElement.style.setProperty('--ion-background-color', ionBackground);
   const url = URL.createObjectURL(blob);
   const image = document.createElement("img");
   image.src = url;

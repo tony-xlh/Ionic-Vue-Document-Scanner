@@ -68,7 +68,7 @@ onMounted(async () => {
       updateViewBox();
       startScanning();
     });
-
+    
     await CameraPreview.startCamera();
   } catch (error) {
     alert(error);
