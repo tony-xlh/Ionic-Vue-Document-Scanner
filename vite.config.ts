@@ -8,7 +8,14 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          // treat image cropper as custom elements
+          isCustomElement: (tag) => tag.includes('image-cropper')
+        }
+      }
+    }),
     legacy()
   ],
   resolve: {
