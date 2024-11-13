@@ -28,7 +28,7 @@
       <div class="scanner fullscreen" v-if="mode==='scanning'">
         <DocumentScanner @on-scanned="onScanned" @on-stopped="onStopped"></DocumentScanner>
       </div>
-      <ion-loading :is-open="!initialized" message="Loading..." />
+      <ion-loading :is-open="!initialized" message="Loading..." :backdropDismiss="true" :duration="3000" />
     </ion-content>
   </ion-page>
 </template>
@@ -57,11 +57,14 @@ let ionBackground = "";
 let photoPath:string|undefined;
 
 onMounted(async () => {
+  console.log("mounted");
   try {
     await DocumentNormalizer.initLicense({license:"DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="});  
   }catch(error) {
+    console.log(error);
     alert(error);
   }
+  console.log("initialized");
   initialized.value = true;
   ionBackground = document.documentElement.style.getPropertyValue('--ion-background-color');
 });
