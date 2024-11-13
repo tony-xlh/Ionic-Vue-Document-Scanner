@@ -4,6 +4,12 @@ An Ionic vue document scanner using [Dynamsoft Document Normalizer](https://www.
 
 [Online demo](https://comforting-praline-251825.netlify.app/)
 
+
+
+https://github.com/user-attachments/assets/bc4e0724-160c-4b55-b96f-4efb23ea0b99
+
+
+
 ## How to Run
 
 For Web:
