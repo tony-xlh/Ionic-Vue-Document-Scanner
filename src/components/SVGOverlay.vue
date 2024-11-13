@@ -46,10 +46,8 @@ export default defineComponent({
 #overlay {
   left: 0;
   top: 0;
-  top: env(safe-area-inset-top);
   width: 100%;
   height: 100%;
-  height: calc(100% - env(safe-area-inset-top));
 }
 
 .fixed {
